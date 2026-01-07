@@ -21,9 +21,8 @@ source.exclude_dirs = tests, bin, .venv, .idea, __pycache__, static/icons
 # (str) Application versioning
 version = 1.0.2
 
-# (list) Application requirements
-# Critical: Pandas and Numpy need specific NDK support and recipes
-requirements = python3,kivy==2.2.1,flask,flask-cors,requests,pandas,numpy,python-dateutil,fyers-apiv3,webcolors,sqlite3,openssl
+# Critical: Numpy must come before Pandas for correct recipe ordering
+requirements = python3,kivy==2.2.1,numpy,pandas,flask,flask-cors,requests,python-dateutil,fyers-apiv3,webcolors,sqlite3,openssl
 
 # (str) Icon of the application
 icon.filename = static/icons/icon-512.png
