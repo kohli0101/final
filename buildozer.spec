@@ -52,8 +52,8 @@ android.ndk_api = 24
 # (bool) Accept SDK license
 android.accept_sdk_license = True
 
-# (list) Android architectures
-android.archs = arm64-v8a, armeabi-v7a
+# (list) Android architectures (Reduced to arm64 only to save 50% build time)
+android.archs = arm64-v8a
 
 # (bool) enables Android auto backup feature
 android.allow_backup = True
