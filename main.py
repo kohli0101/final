@@ -12,6 +12,7 @@ from kivy.clock import Clock
 from kivy.logger import Logger
 
 # Standard way to implement WebView in Kivy/Android
+webview_error = None
 try:
     from jnius import autoclass
     from android.runnable import run_on_ui_thread
@@ -21,6 +22,7 @@ try:
     HAS_WEBVIEW = True
 except Exception as e:
     Logger.error(f"WebView: Could not load jnius/android: {e}")
+    webview_error = str(e)
     HAS_WEBVIEW = False
     from kivy.uix.label import Label
 
@@ -29,7 +31,9 @@ class FnOBotApp(App):
         self.root = BoxLayout(orientation='vertical')
         
         if not HAS_WEBVIEW:
-            self.root.add_widget(Label(text="FnO Bot Starting...\nWebView only available in APK"))
+            # Display the actual error on screen for debugging
+            msg = f"Error: {webview_error}" if webview_error else "WebView Only in APK"
+            self.root.add_widget(Label(text=f"FnO Bot Starting...\n{msg}", halign='center'))
         
         # Start Flask server in a separate thread
         threading.Thread(target=self.start_flask, daemon=True).start()

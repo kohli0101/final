@@ -22,12 +22,10 @@ source.exclude_dirs = tests, bin, .venv, .idea, __pycache__, static/icons, .gith
 # Exclude docs, logs, notebooks, and unused scripts
 source.exclude_patterns = license, images/*/*.jpg, *.md, *.ipynb, *.log, *.txt, setup_cloud.sh, .DS_Store, *.zip, *.apk
 
-# (str) Application versioning
-version = 1.0.4
-
+# (list) Application requirements
 # Critical: Numpy must come before Pandas for correct recipe ordering
 # Added android, pyjnius for native WebView support
-requirements = python3,kivy==2.2.1,numpy,pandas,flask,flask-cors,requests,python-dateutil,fyers-apiv3,webcolors,sqlite3,openssl,android,pyjnius
+requirements = python3,kivy==2.3.0,numpy,pandas,flask,flask-cors,requests,python-dateutil,fyers-apiv3,webcolors,sqlite3,openssl,android,pyjnius
 
 # (str) Icon of the application
 icon.filename = static/icons/icon-512.png
@@ -49,7 +47,10 @@ android.permissions = INTERNET,ACCESS_NETWORK_STATE
 android.manifest.manifest_xml = <manifest xmlns:android="http://schemas.android.com/apk/res/android"><application android:usesCleartextTraffic="true" /></manifest>
 
 # (int) Target Android API
-android.api = 31
+android.api = 33
+
+# (bool) Enable AndroidX support manually if needed (often handled by p4a now, but good to be explicit)
+android.enable_androidx = True
 
 # (int) Minimum API (Set to 24 for Pandas/Numpy compatibility)
 android.minapi = 24
