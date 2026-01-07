@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FnO Trading Dashboard</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Archivo:wght@400;600;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #050810;
+            --bg-secondary: #0d111b;
+            --bg-card: #151b27;
+            --bg-card-hover: #1c2435;
+            --accent-green: #00ffa3;
+            --accent-red: #ff3366;
+            --accent-yellow: #ffcc33;
+            --accent-blue: #3399ff;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-dim: #64748b;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Archivo', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 12px;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.4;
+            min-height: 100vh;
+            font-size: 15px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Base Card */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 14px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 10px 0;
+        }
+
+        /* Typography */
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .time-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .badge {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            border: 1px solid currentColor;
+        }
+
+        .badge.open {
+            color: var(--accent-green);
+            background: rgba(0, 255, 163, 0.05);
+        }
+
+        .badge.closed {
+            color: var(--accent-red);
+            background: rgba(255, 51, 102, 0.05);
+        }
+
+        /* Indices */
+        .mini-index {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            padding: 8px 12px;
+            flex: 1;
+            border: 1px solid var(--border-color);
+        }
+
+        .index-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+
+        .index-name {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .index-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .index-chg {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Financials */
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .stat-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .stat-main {
+            text-align: right;
+        }
+
+        .stat-main .stat-val {
+            font-size: 28px;
+            color: var(--accent-green);
+        }
+
+        /* Buttons & Control */
+        .btn {
+            border-radius: 12px;
+            border: none;
+            padding: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: 100%;
+            border: 1px solid transparent;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-start {
+            background: var(--accent-green);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 163, 0.15);
+        }
+
+        .btn-start:disabled {
+            background: var(--bg-card-hover) !important;
+            color: var(--text-dim) !important;
+            border: 1px solid var(--border-color);
+            box-shadow: none;
+            opacity: 0.8;
+        }
+
+        .btn-stop {
+            background: var(--bg-card-hover);
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+        }
+
+        .btn-panic {
+            background: var(--accent-red);
+            color: white;
+            margin-top: 10px;
+            border: none;
+            font-size: 13px;
+        }
+
+        .btn-exit-small {
+            background: rgba(255, 51, 102, 0.1);
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 800;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-exit-small:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .mode-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-top: 10px;
+        }
+
+        .mode-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mode-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .mode-status {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-primary);
+            transition: .4s;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: var(--text-dim);
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            border-color: var(--accent-green);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(24px);
+            background-color: var(--accent-green);
+        }
+
+        /* Tabs & Items */
+        .tabs {
+            display: flex;
+            gap: 6px;
+            background: var(--bg-secondary);
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            padding: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 10px;
+            text-transform: uppercase;
+        }
+
+        .tab-btn.active {
+            background: var(--bg-card);
+            color: var(--accent-blue);
+        }
+
+        .item-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .item-name {
+            font-size: 14px;
+            font-weight: 800;
+            flex-grow: 1;
+        }
+
+        .item-badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .badge-ce {
+            background: rgba(0, 255, 163, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(0, 255, 163, 0.2);
+        }
+
+        .badge-pe {
+            background: rgba(255, 51, 102, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(255, 51, 102, 0.2);
+        }
+
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .item-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-label {
+            font-size: 9px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .item-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        /* API Stats Layout Expanded */
+        .api-stats-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .api-stat-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .api-stat-label {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            width: 60px;
+            flex-shrink: 0;
+        }
+
+        .api-progress-bg {
+            flex-grow: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .api-progress-fill {
+            height: 100%;
+            background: var(--accent-green);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .api-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--text-secondary);
+            width: 80px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* Health & Config */
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .config-item {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .config-label {
+            font-size: 9px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .config-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--accent-blue);
+        }
+
+        /* Logs */
+        .logs {
+            background: #000;
+            border-radius: 12px;
+            padding: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            height: 150px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            line-height: 1.4;
+        }
+
+        .log-line {
+            margin-bottom: 4px;
+            display: flex;
+            gap: 8px;
+            opacity: 0.8;
+        }
+
+        .log-time {
+            color: var(--accent-blue);
+            flex-shrink: 0;
+        }
+
+        .log-msg {
+            color: #a1a1aa;
+            word-break: break-all;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(30px);
+            background: var(--bg-card);
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid var(--accent-blue);
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            z-index: 1000;
+            font-size: 13px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .up {
+            color: var(--accent-green);
+        }
+
+        .down {
+            color: var(--accent-red);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(0.5);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        .api-high {
+            background: var(--accent-red) !important;
+        }
+
+        .api-mid {
+            background: var(--accent-yellow) !important;
+        }
+
+        .api-low {
+            background: var(--accent-green) !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 1. Header Card -->
+        <div class="card">
+            <div class="card-row">
+                <div>
+                    <div class="logo">Apex Momentum</div>
+                    <div class="time-display">
+                        <div class="indicator"></div>
+                        <span id="currentTime">--:--:--</span>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div id="marketStatus" class="badge">MARKET --</div>
+                    <div style="font-size: 10px; color: var(--text-dim); margin-top: 4px; font-weight: 700; text-transform: uppercase;"
+                        id="statusText">System Idle</div>
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="card-row">
+                <div class="mini-index">
+                    <div class="index-row"><span class="index-name">NIFTY 50</span> <span class="index-chg"
+                            id="niftyChg">0.00%</span></div>
+                    <div class="index-val" id="niftyLtp">0.00</div>
+                </div>
+                <div class="mini-index">
+                    <div class="index-row"><span class="index-name">BANK NIFTY</span> <span class="index-chg"
+                            id="bankniftyChg">0.00%</span></div>
+                    <div class="index-val" id="bankniftyLtp">0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. (New) Control Card -->
+        <div class="card">
+            <div class="card-grid">
+                <button class="btn btn-start" id="startBtn" onclick="startStrategy()">Start Algo</button>
+                <button class="btn btn-stop" id="stopBtn" onclick="stopStrategy()" disabled>Stop Algo</button>
+            </div>
+            <button class="btn btn-panic" id="panicBtn" onclick="exitAllPositions()" style="display: none;">EXIT ALL
+                POSITIONS (PANIC)</button>
+
+            <div class="mode-card" id="modeCard">
+                <div class="mode-text">
+                    <span class="mode-title">Execution Mode</span>
+                    <span class="mode-status virtual" id="modeStatusText">VIRTUAL TRADING</span>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="modeToggle" onchange="toggleTradingMode(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- 3. (New) Financial Card -->
+        <div class="card">
+            <div class="card-row">
+                <div class="stat-box">
+                    <span class="stat-label" id="pnlLabelText">Virtual P&L</span>
+                    <div class="stat-val stat-main" id="totalPnl">₹0.00</div>
+                    <div style="font-size: 14px; font-weight: 800;" id="totalPnlPercent">0.00%</div>
+                </div>
+                <div class="stat-box" style="text-align: right;">
+                    <span class="stat-label">Available Funds</span>
+                    <div class="stat-val" style="font-size: 20px; color: var(--accent-blue);" id="fundsBalance">₹0.00
+                    </div>
+                </div>
+            </div>
+            <div class="divider"></div>
+            <div class="card-grid">
+                <div class="stat-box">
+                    <span class="stat-label">Total Capital Deployed</span>
+                    <div class="stat-val" id="totalDeployed">₹0</div>
+                </div>
+                <div class="stat-box" style="text-align: right;">
+                    <span class="stat-label">CE/PE Status</span>
+                    <div class="stat-val" style="font-size: 14px;">
+                        <span class="up" id="countCE">0</span> CE / <span class="down" id="countPE">0</span> PE
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">
+                        <span id="capCE">₹0</span> / <span id="capPE">₹0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Operations (Tabs) -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('positions')">Positions</button>
+            <button class="tab-btn" id="ordersTabBtn" onclick="switchTab('orders')">Orders</button>
+        </div>
+
+        <div id="positionsTab" class="tab-content active">
+            <div id="qualifiedStocksList">
+                <div class="empty-state">No active trades</div>
+            </div>
+        </div>
+
+        <div id="ordersTab" class="tab-content">
+            <div id="ordersList">
+                <div class="empty-state">No orders today</div>
+            </div>
+        </div>
+
+        <!-- 5. System Configuration -->
+        <div class="card">
+            <div class="stat-label" style="margin-bottom: 10px;">System Configuration</div>
+            <div class="config-grid">
+                <div class="config-item">
+                    <div class="config-label">Stock Count</div>
+                    <div class="config-val" id="stockCountNav">--</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-label">Update Interval</div>
+                    <div class="config-val" id="updateInterval">1s</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-label">Timeframe</div>
+                    <div class="config-val" id="timeframe">--</div>
+                </div>
+                <div class="config-item">
+                    <div class="config-label">Scan Time</div>
+                    <div class="config-val" id="scanTime">--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. API Usage -->
+        <div class="card">
+            <div class="stat-label" style="margin-bottom: 8px;">API Usage (Live Load)</div>
+            <div class="api-stats-container">
+                <div class="api-stat-row">
+                    <div class="api-stat-label">Second</div>
+                    <div class="api-progress-bg">
+                        <div id="barSec" class="api-progress-fill"></div>
+                    </div>
+                    <div class="api-stat-value" id="valSec">0 / 10</div>
+                </div>
+                <div class="api-stat-row">
+                    <div class="api-stat-label">Minute</div>
+                    <div class="api-progress-bg">
+                        <div id="barMin" class="api-progress-fill"></div>
+                    </div>
+                    <div class="api-stat-value" id="valMin">0 / 200</div>
+                </div>
+                <div class="api-stat-row">
+                    <div class="api-stat-label">Today</div>
+                    <div class="api-progress-bg">
+                        <div id="barDay" class="api-progress-fill"></div>
+                    </div>
+                    <div class="api-stat-value" id="valDay">0 / 100k</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. Activity Logs -->
+        <div class="logs" id="activityLogs">
+            <div class="log-line">
+                <span class="log-time">[00:00:00]</span>
+                <span class="log-msg">Initializing dashboard...</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        let updateInterval;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadConfig();
+            updateDashboard();
+            updateInterval = setInterval(updateDashboard, 1000);
+        });
+
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+                document.getElementById('timeframe').innerText = config.timeframe + 'm';
+                document.getElementById('scanTime').innerText = config.scan_time;
+                if (config.stock_count) document.getElementById('stockCountNav').innerText = config.stock_count;
+                if (config.monitor_interval) document.getElementById('updateInterval').innerText = config.monitor_interval + 's';
+            } catch (error) { console.error('Config error:', error); }
+        }
+
+        async function updateDashboard() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+
+                // 1. Header
+                document.getElementById('currentTime').innerText = data.current_time;
+                const mk = document.getElementById('marketStatus');
+                mk.innerText = `MARKET ${data.market_status.toUpperCase()}`;
+                mk.className = `badge market-badge ${data.market_status}`;
+                document.getElementById('statusText').innerText = data.status === 'running' ? 'ALGO RUNNING' : 'SYSTEM IDLE';
+
+                // Indices
+                updateIndex('nifty', data.indices.NIFTY50);
+                updateIndex('banknifty', data.indices.BANKNIFTY);
+
+                // 2. Financials
+                document.getElementById('totalPnl').innerText = '₹' + (data.total_pnl || 0).toLocaleString(undefined, { minimumFractionDigits: 2 });
+                document.getElementById('totalPnl').className = 'stat-val ' + (data.total_pnl >= 0 ? 'up' : 'down');
+                document.getElementById('totalPnlPercent').innerText = (data.total_pnl_percent || 0).toFixed(2) + '%';
+                document.getElementById('totalPnlPercent').className = data.total_pnl_percent >= 0 ? 'up' : 'down';
+                document.getElementById('fundsBalance').innerText = '₹' + (data.funds || 0).toLocaleString(undefined, { minimumFractionDigits: 0 });
+
+                const totalCap = (data.total_capital_ce || 0) + (data.total_capital_pe || 0);
+                document.getElementById('totalDeployed').innerText = '₹' + Math.round(totalCap).toLocaleString();
+                document.getElementById('capCE').innerText = '₹' + Math.round(data.total_capital_ce || 0).toLocaleString();
+                document.getElementById('capPE').innerText = '₹' + Math.round(data.total_capital_pe || 0).toLocaleString();
+
+                document.getElementById('countCE').innerText = data.total_positions_ce || 0;
+                document.getElementById('countPE').innerText = data.total_positions_pe || 0;
+
+                // 3. Controls
+                document.getElementById('startBtn').disabled = data.status === 'running';
+                document.getElementById('stopBtn').disabled = data.status !== 'running';
+                document.getElementById('panicBtn').style.display = data.status === 'running' ? 'block' : 'none';
+
+                if (data.is_virtual_trading !== undefined) updateModeUI(data.is_virtual_trading);
+
+                const modeToggle = document.getElementById('modeToggle');
+                const modeCard = document.getElementById('modeCard');
+                if (modeToggle && modeCard) {
+                    modeToggle.disabled = data.status === 'running';
+                    if (data.status === 'running') modeCard.classList.add('disabled');
+                    else modeCard.classList.remove('disabled');
+                }
+
+                // 4. Tabs
+                updatePositions(data.qualified_stocks);
+                updateOrdersList(data.orders);
+
+                // 6. API Usage (Detailed)
+                if (data.api_stats) {
+                    const s = data.api_stats;
+                    updateApiBar('Sec', s.calls_last_second, s.limit_per_second);
+                    updateApiBar('Min', s.calls_last_minute, s.limit_per_minute);
+                    updateApiBar('Day', s.calls_today, s.limit_per_day);
+                }
+
+                updateLogs(data.logs);
+            } catch (error) { console.error('Update error:', error); }
+        }
+
+        function updateApiBar(id, val, limit) {
+            const pct = Math.min((val / limit) * 100, 100);
+            const bar = document.getElementById('bar' + id);
+            const valEl = document.getElementById('val' + id);
+            if (bar) {
+                bar.style.width = pct + '%';
+                bar.className = 'api-progress-fill ' + (pct > 80 ? 'api-high' : (pct > 50 ? 'api-mid' : 'api-low'));
+            }
+            if (valEl) {
+                let limitStr = limit >= 1000 ? (limit / 1000) + 'k' : limit;
+                valEl.innerText = `${val} / ${limitStr}`;
+                valEl.style.color = pct > 80 ? 'var(--accent-red)' : (pct > 50 ? 'var(--accent-yellow)' : 'var(--text-secondary)');
+            }
+        }
+
+        function updateIndex(id, val) {
+            if (!val) return;
+            document.getElementById(id + 'Ltp').innerText = val.lp.toLocaleString();
+            const chg = document.getElementById(id + 'Chg');
+            chg.innerText = (val.pc >= 0 ? '+' : '') + val.pc.toFixed(2) + '%';
+            chg.className = 'index-chg ' + (val.pc >= 0 ? 'up' : 'down');
+        }
+
+        function updatePositions(stocks) {
+            const container = document.getElementById('qualifiedStocksList');
+            const keys = Object.keys(stocks);
+            if (keys.length === 0) {
+                container.innerHTML = '<div class="empty-state">No active trades</div>';
+                return;
+            }
+
+            container.innerHTML = keys.map(sym => {
+                const s = stocks[sym];
+                const pnl = s.pnl || 0;
+                const pnlPct = s.entry_price ? ((s.ltp - s.entry_price) / s.entry_price * 100) : 0;
+                const sideClass = s.type === 'CE' ? 'badge-ce' : 'badge-pe';
+                return `
+                    <div class="item-card">
+                        <div class="item-row">
+                            <div class="item-name" style="font-size: 13px;">${s.option_symbol || s.symbol}</div>
+                            <span class="item-badge ${sideClass}">${s.type}</span>
+                            ${(s.status || '').toUpperCase() !== 'EXITED' ? `<button class="btn-exit-small" style="margin-left: 10px;" onclick="exitPosition('${sym}')">Exit</button>` : ''}
+                        </div>
+                        <div class="divider" style="margin: 8px 0; opacity: 0.3;"></div>
+                        <div class="item-grid">
+                            <div class="item-stat"><span class="item-label">Status</span><span class="item-val" style="color: var(--accent-blue)">${s.status}</span></div>
+                            <div class="item-stat" style="text-align: right;"><span class="item-label">PnL</span><span class="item-val ${pnl >= 0 ? 'up' : 'down'}" style="font-size: 18px;">₹${pnl.toFixed(2)}</span></div>
+                            <div class="item-stat"><span class="item-label">Entry / LTP</span><span class="item-val" style="font-size: 12px; color: var(--text-secondary);">₹${(s.entry_price || 0).toFixed(2)} / ₹${(s.ltp || 0).toFixed(2)}</span></div>
+                            <div class="item-stat" style="text-align: right;"><span class="item-label">PnL %</span><span class="item-val ${pnlPct >= 0 ? 'up' : 'down'}" style="font-size: 12px;">${pnlPct >= 0 ? '+' : ''}${pnlPct.toFixed(2)}%</span></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateOrdersList(orders) {
+            const container = document.getElementById('ordersList');
+            if (!orders || orders.length === 0) {
+                container.innerHTML = '<div class="empty-state">No orders today</div>';
+                return;
+            }
+
+            // Sort newest to oldest
+            const sortedOrders = [...orders].sort((a, b) => {
+                const timeA = new Date(a.orderDateTime || 0).getTime();
+                const timeB = new Date(b.orderDateTime || 0).getTime();
+                return timeB - timeA;
+            });
+
+            container.innerHTML = sortedOrders.map(o => `
+                <div class="item-card">
+                    <div class="item-row">
+                        <div class="item-name" style="font-size: 13px;">${o.symbol}</div>
+                        <div class="item-badge ${o.side === 1 ? 'badge-ce' : 'badge-pe'}">${o.side === 1 ? 'BUY' : 'SELL'}</div>
+                    </div>
+                    <div class="divider" style="margin: 8px 0; opacity: 0.3;"></div>
+                    <div class="item-grid">
+                        <div class="item-stat"><span class="item-label">Time</span><span class="item-val">${o.orderDateTime ? o.orderDateTime.split(' ')[1] : '--'}</span></div>
+                        <div class="item-stat"><span class="item-label">Price</span><span class="item-val">₹${o.tradedPrice || o.limitPrice || 0}</span></div>
+                        <div class="item-stat"><span class="item-label">Status</span><span class="item-val" style="color: ${o.status === 2 ? 'var(--accent-green)' : 'var(--accent-red)'}">${o.status === 2 ? 'FILLED' : (o.status === 1 ? 'PENDING' : 'FAILED')}</span></div>
+                        <div class="item-stat" style="text-align: right;"><span class="item-label">Reason</span><span class="item-val" style="font-size: 10px; color: var(--text-dim);">${o.message || 'No info'}</span></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateLogs(logs) {
+            const container = document.getElementById('activityLogs');
+            if (!logs) return;
+            const content = logs.map(log => {
+                let time, msg;
+                if (typeof log === 'object') {
+                    time = `[${log.time}]`;
+                    msg = log.message;
+                } else {
+                    const parts = log.split('] ');
+                    time = parts[0] + ']';
+                    msg = parts[1] || '';
+                }
+                return `<div class="log-line"><span class="log-time">${time}</span><span class="log-msg">${msg}</span></div>`;
+            }).join('');
+            if (container.innerHTML !== content) {
+                container.innerHTML = content;
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            if (tab === 'orders') document.getElementById('ordersTabBtn').classList.add('active');
+            else document.querySelector('.tab-btn[onclick*="positions"]').classList.add('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+        }
+
+        async function startStrategy() {
+            const btn = document.getElementById('startBtn');
+            btn.disabled = true;
+            try {
+                const res = await fetch('/api/start', { method: 'POST' });
+                const data = await res.json();
+                showToast(data.message, data.success ? 'success' : 'error');
+            } catch (e) { showToast('Error starting algo', 'error'); }
+        }
+
+        async function stopStrategy() {
+            try {
+                const res = await fetch('/api/stop', { method: 'POST' });
+                const data = await res.json();
+                showToast(data.message, data.success ? 'success' : 'error');
+            } catch (e) { showToast('Error stopping algo', 'error'); }
+        }
+
+        async function exitPosition(stock) {
+            if (!confirm(`Are you sure you want to EXIT position for ${stock}?`)) return;
+            try {
+                const res = await fetch('/api/exit-position', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ stock: stock })
+                });
+                const data = await res.json();
+                showToast(data.message, data.success ? 'success' : 'error');
+            } catch (e) { showToast('Error exiting position', 'error'); }
+        }
+
+        async function exitAllPositions() {
+            if (!confirm('Are you sure you want to EXIT ALL positions?')) return;
+            try {
+                const res = await fetch('/api/exit-all', { method: 'POST' });
+                const data = await res.json();
+                showToast(data.message, data.success ? 'success' : 'error');
+            } catch (e) { showToast('Error exiting positions', 'error'); }
+        }
+
+        async function toggleTradingMode(el) {
+            const isLive = el.checked;
+            try {
+                const res = await fetch('/api/toggle-virtual', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ is_virtual: !isLive })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    updateModeUI(!isLive);
+                    showToast(data.message, 'success');
+                } else {
+                    el.checked = !isLive;
+                    showToast(data.message, 'error');
+                }
+            } catch (e) { el.checked = !isLive; showToast('Mode switch failed', 'error'); }
+        }
+
+        function updateModeUI(isVirtual) {
+            const text = document.getElementById('modeStatusText');
+            const lbl = document.getElementById('pnlLabelText');
+            const toggle = document.getElementById('modeToggle');
+            const start = document.getElementById('startBtn');
+
+            if (isVirtual) {
+                text.innerText = 'VIRTUAL TRADING';
+                text.className = 'mode-status virtual';
+                lbl.innerText = 'Virtual P&L';
+                toggle.checked = false;
+                if (start) start.style.background = 'var(--accent-green)';
+            } else {
+                text.innerText = 'LIVE TRADING';
+                text.className = 'mode-status live';
+                lbl.innerText = 'Live P&L';
+                toggle.checked = true;
+                if (start) start.style.background = 'var(--accent-red)';
+            }
+        }
+
+        function showToast(msg, type) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.className = 'toast show ' + type;
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+    </script>
+</body>
+
+</html>

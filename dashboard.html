@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0f1e">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>FnO Trading Dashboard</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Archivo:wght@300;400;600;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-primary: #0a0f1e;
+            --bg-secondary: #111827;
+            --bg-card: #1a2332;
+            --bg-card-hover: #212d42;
+            --accent-green: #00ff88;
+            --accent-red: #ff4466;
+            --accent-yellow: #ffbb33;
+            --accent-blue: #3388ff;
+            --text-primary: #f0f4f8;
+            --text-secondary: #8b95a5;
+            --text-dim: #5a6270;
+            --border-color: #2a3446;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Archivo', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 136, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(51, 136, 255, 0.06) 0%, transparent 40%);
+            animation: bgShift 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes bgShift {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(20px, -20px) scale(1.1);
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 100%;
+            padding: 16px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border-radius: 20px;
+            padding: 24px 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .time-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .live-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .market-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .market-status.open {
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .market-status.closed {
+            background: rgba(255, 68, 102, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(255, 68, 102, 0.3);
+        }
+
+        .market-status.pre-market {
+            background: rgba(255, 187, 51, 0.15);
+            color: var(--accent-yellow);
+            border: 1px solid rgba(255, 187, 51, 0.3);
+        }
+
+        .control-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            font-family: 'Archivo', sans-serif;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+            color: #0a0f1e;
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.4);
+        }
+
+        .btn-start:active {
+            transform: scale(0.96);
+        }
+
+        .btn-stop {
+            background: var(--bg-card);
+            color: var(--accent-red);
+            border: 2px solid var(--accent-red);
+        }
+
+        .btn-stop:active {
+            background: rgba(255, 68, 102, 0.1);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .status-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .status-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-badge.running {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--accent-green);
+        }
+
+        .status-badge.stopped {
+            background: rgba(255, 68, 102, 0.2);
+            color: var(--accent-red);
+        }
+
+        .status-badge.idle {
+            background: rgba(139, 149, 165, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .pnl-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .pnl-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 18px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pnl-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .pnl-card.positive::before {
+            background: linear-gradient(90deg, var(--accent-green) 0%, transparent 100%);
+        }
+
+        .pnl-card.negative::before {
+            background: linear-gradient(90deg, var(--accent-red) 0%, transparent 100%);
+        }
+
+        .pnl-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .pnl-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .pnl-value.positive {
+            color: var(--accent-green);
+        }
+
+        .pnl-value.negative {
+            color: var(--accent-red);
+        }
+
+        .stocks-section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            padding: 0 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(180deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+            border-radius: 2px;
+        }
+
+        .stock-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .stock-card:active {
+            transform: scale(0.98);
+            background: var(--bg-card-hover);
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }
+
+        .stock-name {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .stock-strike {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .stock-pnl-badge {
+            font-family: 'JetBrains Mono', monospace;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .stock-pnl-badge.positive {
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--accent-green);
+        }
+
+        .stock-pnl-badge.negative {
+            background: rgba(255, 68, 102, 0.15);
+            color: var(--accent-red);
+        }
+
+        .stock-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detail-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-dim);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-message {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .empty-hint {
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            border: 1px solid var(--border-color);
+            z-index: 1000;
+            min-width: 280px;
+            max-width: 90%;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--accent-red);
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .config-item {
+            background: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .config-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-top: 4px;
+        }
+
+        @media (max-width: 360px) {
+            .logo {
+                font-size: 24px;
+            }
+
+            .pnl-value {
+                font-size: 20px;
+            }
+
+            .stock-name {
+                font-size: 16px;
+            }
+        }
+
+        /* API Stats Styling */
+        .api-stats-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .api-stat-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .api-stat-label {
+            min-width: 90px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .api-stat-bar-container {
+            flex: 1;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .api-stat-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            transition: width 0.3s ease, background 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .api-stat-bar.warning {
+            background: linear-gradient(90deg, var(--accent-yellow), var(--accent-red));
+        }
+
+        .api-stat-bar.danger {
+            background: var(--accent-red);
+        }
+
+        .api-stat-value {
+            min-width: 100px;
+            text-align: right;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .ltp-badge {
+            display: inline-block;
+            background: rgba(51, 136, 255, 0.15);
+            color: var(--accent-blue);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            margin-top: 4px;
+        }
+
+        .entry-price-label {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .entry-price-value {
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">FnO TRADER</div>
+                <div class="time-display">
+                    <span class="live-indicator"></span>
+                    <span id="currentTime">--:--:--</span>
+                </div>
+                <div class="market-status" id="marketStatus">
+                    <span>●</span>
+                    <span>MARKET CLOSED</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <button class="btn btn-start" id="startBtn" onclick="startStrategy()">
+                ▶ START
+            </button>
+            <button class="btn btn-stop" id="stopBtn" onclick="stopStrategy()">
+                ■ STOP
+            </button>
+        </div>
+
+        <div class="status-card">
+            <div class="status-label">Strategy Status</div>
+            <div class="status-value">
+                <span class="status-badge idle" id="statusBadge">IDLE</span>
+                <span id="statusText">Ready to start</span>
+            </div>
+        </div>
+
+        <div class="pnl-summary">
+            <div class="pnl-card" id="totalPnlCard">
+                <div class="pnl-label">Total P&L</div>
+                <div class="pnl-value" id="totalPnl">₹0.00</div>
+            </div>
+            <div class="pnl-card" id="totalPnlPercentCard">
+                <div class="pnl-label">P&L %</div>
+                <div class="pnl-value" id="totalPnlPercent">0.00%</div>
+            </div>
+        </div>
+
+        <!-- CE/PE Breakdown -->
+        <div class="pnl-summary" style="grid-template-columns: repeat(2, 1fr); margin-bottom: 20px;">
+            <div class="pnl-card">
+                <div class="pnl-label">CE Positions</div>
+                <div class="status-value">
+                    <span id="posCountCE" style="color: var(--accent-green);">0</span>
+                    <span style="font-size: 11px; color: var(--text-dim); margin-left: auto;">₹<span
+                            id="capCE">0</span></span>
+                </div>
+            </div>
+            <div class="pnl-card">
+                <div class="pnl-label">PE Positions</div>
+                <div class="status-value">
+                    <span id="posCountPE" style="color: var(--accent-red);">0</span>
+                    <span style="font-size: 11px; color: var(--text-dim); margin-left: auto;">₹<span
+                            id="capPE">0</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="stocks-section">
+            <div class="section-title">
+                Active Positions
+            </div>
+            <div id="stocksList">
+                <div class="empty-state">
+                    <div class="empty-icon">📊</div>
+                    <div class="empty-message">No Active Positions</div>
+                    <div class="empty-hint">Start the strategy to begin monitoring</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-card">
+            <div class="status-label">Configuration</div>
+            <div class="config-grid" style="margin-top: 12px;">
+                <div class="config-item">
+                    <div class="detail-label">Timeframe</div>
+                    <div class="config-value" id="timeframe">3 min</div>
+                </div>
+                <div class="config-item">
+                    <div class="detail-label">Scan Time</div>
+                    <div class="config-value" id="scanTime">09:18:10</div>
+                </div>
+                <div class="config-item">
+                    <div class="detail-label">Stocks</div>
+                    <div class="config-value" id="stockCount">0</div>
+                </div>
+                <div class="config-item">
+                    <div class="detail-label">Update Interval</div>
+                    <div class="config-value" id="updateInterval">2s</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Usage Stats Card -->
+        <div class="status-card api-stats-card">
+            <div class="status-label">📊 API Usage (Fyers Limits)</div>
+            <div style="margin-top: 12px;">
+                <!-- Per Day -->
+                <div class="api-stat-row">
+                    <div class="api-stat-label">Today</div>
+                    <div class="api-stat-bar-container">
+                        <div class="api-stat-bar" id="apiBarDay" style="width: 0%"></div>
+                    </div>
+                    <div class="api-stat-value" id="apiValueDay">0 / 100K</div>
+                </div>
+
+                <!-- Per Minute -->
+                <div class="api-stat-row">
+                    <div class="api-stat-label">Per Minute</div>
+                    <div class="api-stat-bar-container">
+                        <div class="api-stat-bar" id="apiBarMinute" style="width: 0%"></div>
+                    </div>
+                    <div class="api-stat-value" id="apiValueMinute">0 / 200</div>
+                </div>
+
+                <!-- Per Second -->
+                <div class="api-stat-row">
+                    <div class="api-stat-label">Per Second</div>
+                    <div class="api-stat-bar-container">
+                        <div class="api-stat-bar" id="apiBarSecond" style="width: 0%"></div>
+                    </div>
+                    <div class="api-stat-value" id="apiValueSecond">0 / 10</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let updateInterval;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadConfig();
+            updateDashboard();
+            updateInterval = setInterval(updateDashboard, 2000);
+
+            // Register Service Worker for PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/static/service-worker.js')
+                    .then(reg => console.log('Service Worker Registered'))
+                    .catch(err => console.log('Service Worker Failed', err));
+            }
+        });
+
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+
+                document.getElementById('timeframe').textContent = config.timeframe + ' min';
+                document.getElementById('scanTime').textContent = config.scan_time;
+                document.getElementById('stockCount').textContent = config.stock_count;
+                document.getElementById('updateInterval').textContent = config.monitor_interval + 's';
+            } catch (error) {
+                console.error('Error loading config:', error);
+            }
+        }
+
+        async function updateDashboard() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+
+                // Update time
+                document.getElementById('currentTime').textContent = data.current_time;
+
+                // Update market status
+                const marketStatus = document.getElementById('marketStatus');
+                marketStatus.className = 'market-status ' + data.market_status;
+                marketStatus.innerHTML = `<span>●</span><span>MARKET ${data.market_status.toUpperCase()}</span>`;
+
+                // Update status
+                const statusBadge = document.getElementById('statusBadge');
+                statusBadge.className = 'status-badge ' + data.status;
+                statusBadge.textContent = data.status.toUpperCase();
+
+                document.getElementById('statusText').textContent =
+                    data.status === 'running' ? 'Strategy is active' :
+                        data.status === 'stopped' ? 'Strategy stopped' : 'Ready to start';
+
+                // Update P&L
+                updatePnL(data.total_pnl, data.total_pnl_percent);
+
+                // Update Stocks List
+                updateStocksList(data.qualified_stocks);
+
+                // Update CE/PE counts
+                document.getElementById('posCountCE').textContent = data.total_positions_ce || 0;
+                document.getElementById('posCountPE').textContent = data.total_positions_pe || 0;
+                document.getElementById('capCE').textContent = (data.total_capital_ce || 0).toLocaleString();
+                document.getElementById('capPE').textContent = (data.total_capital_pe || 0).toLocaleString();
+
+                // Update API stats
+                updateAPIStats(data.api_stats);
+
+                document.getElementById('startBtn').disabled = data.status === 'running';
+                document.getElementById('stopBtn').disabled = data.status !== 'running';
+
+            } catch (error) {
+                console.error('Error updating dashboard:', error);
+            }
+        }
+
+        function updatePnL(pnl, pnlPercent) {
+            const pnlElement = document.getElementById('totalPnl');
+            const pnlPercentElement = document.getElementById('totalPnlPercent');
+            const pnlCard = document.getElementById('totalPnlCard');
+            const pnlPercentCard = document.getElementById('totalPnlPercentCard');
+
+            const isPositive = pnl >= 0;
+            const className = isPositive ? 'positive' : 'negative';
+
+            pnlElement.textContent = (pnl >= 0 ? '+' : '') + '₹' + pnl.toFixed(2);
+            pnlElement.className = 'pnl-value ' + className;
+            pnlCard.className = 'pnl-card ' + className;
+
+            pnlPercentElement.textContent = (pnlPercent >= 0 ? '+' : '') + pnlPercent.toFixed(2) + '%';
+            pnlPercentElement.className = 'pnl-value ' + className;
+            pnlPercentCard.className = 'pnl-card ' + className;
+        }
+
+        function updateStocksList(stocks) {
+            const stocksList = document.getElementById('stocksList');
+
+            if (!stocks || Object.keys(stocks).length === 0) {
+                stocksList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📊</div>
+                        <div class="empty-message">No Active Positions</div>
+                        <div class="empty-hint">Start the strategy to begin monitoring</div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            for (const [symbol, data] of Object.entries(stocks)) {
+                const isPositive = data.total_pnl >= 0;
+                const pnlClass = isPositive ? 'positive' : 'negative';
+
+                html += `
+                    <div class="stock-card">
+                        <div class="stock-header">
+                            <div>
+                                <div class="stock-name">${data.symbol}</div>
+                                <div class="stock-strike" style="color: ${data.type === 'CE' ? 'var(--accent-green)' : 'var(--accent-red)'}">
+                                    ${data.strike} ${data.type} • Lot: ${data.lot_size}
+                                </div>
+                            </div>
+                            <div class="stock-pnl-badge ${pnlClass}">
+                                ${isPositive ? '+' : ''}${data.pnl_percent.toFixed(2)}%
+                            </div>
+                        </div>
+                        
+                        <div class="stock-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Entry</div>
+                                <div class="detail-value">₹${data.entry_price.toFixed(2)}</div>
+                                <div style="font-size: 9px; color: var(--text-dim);">${data.entry_time}</div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <div class="detail-label">LTP</div>
+                                <div class="detail-value">
+                                    <span class="ltp-badge">₹${data.current_price.toFixed(2)}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <div class="detail-label">P&L</div>
+                                <div class="detail-value" style="color: ${isPositive ? 'var(--accent-green)' : 'var(--accent-red)'}; font-weight: 700;">
+                                    ${isPositive ? '+' : ''}₹${data.total_pnl.toFixed(2)}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 10px; display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim);">
+                            <span>Invested: ₹${data.investment.toFixed(2)}</span>
+                            <span>Symbol: ${data.option_symbol}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            stocksList.innerHTML = html;
+        }
+
+        function updateAPIStats(apiStats) {
+            if (!apiStats) return;
+
+            // Update Per Day
+            const percentDay = apiStats.percent_used_day || 0;
+            const barDay = document.getElementById('apiBarDay');
+            const valueDay = document.getElementById('apiValueDay');
+
+            if (barDay && valueDay) {
+                barDay.style.width = `${Math.min(percentDay, 100)}%`;
+                barDay.className = 'api-stat-bar' +
+                    (percentDay > 80 ? ' danger' : percentDay > 50 ? ' warning' : '');
+                valueDay.textContent = `${apiStats.calls_today || 0} / ${(apiStats.limit_per_day / 1000).toFixed(0)}K`;
+            }
+
+            // Update Per Minute
+            const percentMinute = apiStats.percent_used_minute || 0;
+            const barMinute = document.getElementById('apiBarMinute');
+            const valueMinute = document.getElementById('apiValueMinute');
+
+            if (barMinute && valueMinute) {
+                barMinute.style.width = `${Math.min(percentMinute, 100)}%`;
+                barMinute.className = 'api-stat-bar' +
+                    (percentMinute > 80 ? ' danger' : percentMinute > 50 ? ' warning' : '');
+                valueMinute.textContent = `${apiStats.calls_last_minute || 0} / ${apiStats.limit_per_minute || 200}`;
+            }
+
+            // Update Per Second
+            const percentSecond = apiStats.percent_used_second || 0;
+            const barSecond = document.getElementById('apiBarSecond');
+            const valueSecond = document.getElementById('apiValueSecond');
+
+            if (barSecond && valueSecond) {
+                barSecond.style.width = `${Math.min(percentSecond, 100)}%`;
+                barSecond.className = 'api-stat-bar' +
+                    (percentSecond > 80 ? ' danger' : percentSecond > 50 ? ' warning' : '');
+                valueSecond.textContent = `${apiStats.calls_last_second || 0} / ${apiStats.limit_per_second || 10}`;
+            }
+        }
+
+        async function startStrategy() {
+            showToast('Starting strategy...', 'success');
+
+            try {
+                const response = await fetch('/api/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    updateDashboard();
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Error starting strategy', 'error');
+                console.error(error);
+            }
+        }
+
+        async function stopStrategy() {
+            try {
+                const response = await fetch('/api/stop', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    updateDashboard();
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                showToast('Error stopping strategy', 'error');
+                console.error(error);
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type + ' show';
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        document.body.addEventListener('touchmove', (e) => {
+            if (e.touches[0].clientY > 50) return;
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+
+</html>

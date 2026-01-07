@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Fyers Token</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .auth-link {
+            display: block;
+            background: #667eea;
+            color: white;
+            padding: 15px 25px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            margin: 15px 0;
+            transition: transform 0.2s;
+        }
+
+        .auth-link:hover {
+            transform: scale(1.02);
+            background: #5568d3;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #059669;
+            transform: scale(1.02);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result.success {
+            display: block;
+        }
+
+        .result.error {
+            background: #fef2f2;
+            border-color: #ef4444;
+            display: block;
+        }
+
+        .token-display {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .copy-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .info {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #1e40af;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Generate Fyers Token</h1>
+        <p class="subtitle">Follow these steps to get your access token</p>
+
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">1</span>
+                Authorize the App
+            </div>
+            <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                Click the button below to open Fyers authorization page
+            </p>
+            <a href="#" id="authLink" class="auth-link" target="_blank">
+                🚀 Open Authorization Page
+            </a>
+        </div>
+
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">2</span>
+                Paste Redirect URL
+            </div>
+            <p style="color: #666; font-size: 14px; margin-top: 10px;">
+                After authorization, you'll be redirected. Copy the entire URL and paste it here:
+            </p>
+            <input type="text" id="redirectUrl" placeholder="https://127.0.0.1:5000/?auth_code=XXXXX...">
+        </div>
+
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">3</span>
+                Generate Token
+            </div>
+            <button class="btn" id="generateBtn" onclick="generateToken()">
+                Generate Access Token
+            </button>
+        </div>
+
+        <div class="result" id="result">
+            <div style="font-weight: 600; margin-bottom: 10px;">✅ Token Generated Successfully!</div>
+            <div class="token-display" id="tokenDisplay"></div>
+            <button class="copy-btn" onclick="copyToken()">📋 Copy Token</button>
+            <div style="margin-top: 15px; font-size: 14px; color: #059669;">
+                Token saved to server. Valid for 24 hours.
+            </div>
+        </div>
+
+        <div class="info">
+            <strong>💡 Note:</strong> This token expires in 24 hours. You'll need to generate a new one daily before trading.
+        </div>
+    </div>
+
+    <script>
+        // Get auth URL from server
+        fetch('/api/get-auth-url')
+            .then(res => res.json())
+            .then(data => {
+                if (data.auth_url) {
+                    document.getElementById('authLink').href = data.auth_url;
+                }
+            });
+
+        async function generateToken() {
+            const redirectUrl = document.getElementById('redirectUrl').value.trim();
+            const resultDiv = document.getElementById('result');
+            const btn = document.getElementById('generateBtn');
+
+            if (!redirectUrl) {
+                alert('Please paste the redirect URL first!');
+                return;
+            }
+
+            // Extract auth code
+            const urlParams = new URLSearchParams(redirectUrl.split('?')[1]);
+            const authCode = urlParams.get('auth_code');
+
+            if (!authCode) {
+                alert('Invalid redirect URL. Please make sure you copied the complete URL.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Generating...';
+
+            try {
+                const response = await fetch('/api/generate-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ auth_code: authCode })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    document.getElementById('tokenDisplay').textContent = data.access_token;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.innerHTML = `<strong>❌ Error:</strong> ${data.message}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `<strong>❌ Error:</strong> ${error.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Generate Access Token';
+            }
+        }
+
+        function copyToken() {
+            const tokenText = document.getElementById('tokenDisplay').textContent;
+            navigator.clipboard.writeText(tokenText).then(() => {
+                alert('✅ Token copied to clipboard!');
+            });
+        }
+    </script>
+</body>
+</html>

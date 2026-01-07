@@ -1,0 +1,9 @@
+fyers-apiv3
+pandas
+numpy
+requests
+python-dateutil
+flask
+flask-cors
+flask
+flask-cors
