@@ -19,10 +19,10 @@ source.include_exts = py,png,jpg,kv,atlas,html,js,css,json,csv,txt
 source.exclude_dirs = tests, bin, .venv, .idea, __pycache__, static/icons
 
 # (str) Application versioning
-version = 1.0.1
+version = 1.0.2
 
 # (list) Application requirements
-# Added sqlite3, openssl and pinned versions for stability
+# Critical: Pandas and Numpy need specific NDK support and recipes
 requirements = python3,kivy==2.2.1,flask,flask-cors,requests,pandas,numpy,python-dateutil,fyers-apiv3,webcolors,sqlite3,openssl
 
 # (str) Icon of the application
@@ -44,8 +44,11 @@ android.permissions = INTERNET,ACCESS_NETWORK_STATE
 # (int) Target Android API
 android.api = 31
 
-# (int) Minimum API
-android.minapi = 21
+# (int) Minimum API (Set to 24 for Pandas/Numpy compatibility)
+android.minapi = 24
+
+# (int) NDK API (Set to 24 for Pandas/Numpy compatibility)
+android.ndk_api = 24
 
 # (bool) Accept SDK license
 android.accept_sdk_license = True
@@ -78,4 +81,5 @@ log_level = 2
 
 # (int) Display warning if buildozer is run as root
 warn_on_root = 1
+
 
