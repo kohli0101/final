@@ -19,10 +19,11 @@ source.include_exts = py,png,jpg,kv,atlas,html,js,css,json,csv,txt
 source.exclude_dirs = tests, bin, .venv, .idea, __pycache__, static/icons
 
 # (str) Application versioning
-version = 1.0.2
+version = 1.0.3
 
 # Critical: Numpy must come before Pandas for correct recipe ordering
-requirements = python3,kivy==2.2.1,numpy,pandas,flask,flask-cors,requests,python-dateutil,fyers-apiv3,webcolors,sqlite3,openssl
+# Added android, pyjnius for native WebView support
+requirements = python3,kivy==2.2.1,numpy,pandas,flask,flask-cors,requests,python-dateutil,fyers-apiv3,webcolors,sqlite3,openssl,android,pyjnius
 
 # (str) Icon of the application
 icon.filename = static/icons/icon-512.png
@@ -39,6 +40,9 @@ fullscreen = 1
 
 # (list) Permissions
 android.permissions = INTERNET,ACCESS_NETWORK_STATE
+
+# (str) Extra xml tree to add to manifest (Allow cleartext for local Flask)
+android.manifest.manifest_xml = <manifest xmlns:android="http://schemas.android.com/apk/res/android"><application android:usesCleartextTraffic="true" /></manifest>
 
 # (int) Target Android API
 android.api = 31
