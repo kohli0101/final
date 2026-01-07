@@ -16,10 +16,14 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,html,js,css,json,csv,txt
 
 # (list) Source files to exclude
-source.exclude_dirs = tests, bin, .venv, .idea, __pycache__, static/icons
+source.exclude_dirs = tests, bin, .venv, .idea, __pycache__, static/icons, .github, .git
+
+# (list) List of exclusions using pattern matching
+# Exclude docs, logs, notebooks, and unused scripts
+source.exclude_patterns = license, images/*/*.jpg, *.md, *.ipynb, *.log, *.txt, setup_cloud.sh, .DS_Store, *.zip, *.apk
 
 # (str) Application versioning
-version = 1.0.3
+version = 1.0.4
 
 # Critical: Numpy must come before Pandas for correct recipe ordering
 # Added android, pyjnius for native WebView support
